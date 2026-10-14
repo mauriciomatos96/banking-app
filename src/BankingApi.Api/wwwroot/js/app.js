@@ -114,6 +114,9 @@ function loginView() {
   const tabs = h('div', { class: 'tabs', role: 'tablist' });
 
   function setMode(value) {
+    // Switching tabs starts from an empty form, so values typed (or autofilled by the
+    // browser) for one user are not carried over to the other form.
+    if (value !== mode) form.reset();
     mode = value;
     const registering = mode === 'register';
     tabs.replaceChildren(tabButton('login', 'Iniciar sesión'), tabButton('register', 'Registrarse'));
@@ -122,8 +125,11 @@ function loginView() {
     passwordHint.classList.toggle('hidden', !registering);
     form.password.minLength = registering ? 8 : 1;
     form.password.autocomplete = registering ? 'new-password' : 'current-password';
+    // Stop the browser from suggesting the previous user's email when creating a new one.
+    form.email.autocomplete = registering ? 'off' : 'email';
     submit.textContent = registering ? 'Crear usuario' : 'Iniciar sesión';
     errorBox.classList.add('hidden');
+    (registering ? form.fullName : form.email).focus();
   }
   setMode('login');
 
